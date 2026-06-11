@@ -94,6 +94,19 @@ adapter 在转发之前检查最后一条用户消息，拦截特殊命令：
 - `switch_to_execute()` / `switch_to_plan()` — 切换 phase
 - `make_permission_handler()` — 为 WebSocket 版本保留，adapter 版本使用 `auto_allow`（自动放行所有工具）
 
+### tools/watch.py
+`tools/watch.py` 是可选调试脚本，不参与 BioAgent 的正常运行。它配合 mitmproxy 作为 Open WebUI 和 adapter 之间的反向代理，用于观察：
+
+- Open WebUI 实际发送的 `messages`
+- adapter 返回的 SSE 文本增量
+
+典型用法：
+```bash
+mitmdump --mode reverse:http://localhost:8001 --listen-port 8888 -s tools/watch.py
+```
+
+调试时将 Open WebUI 的 API URL 临时改为 `http://host.docker.internal:8888`，请求会先经过监控脚本，再转发到 `adapter.py:8001`。
+
 ---
 
 ## 关键设计决策

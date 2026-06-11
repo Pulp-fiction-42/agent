@@ -28,6 +28,8 @@ MiniMax API（远程）
 agent_sdk/
 ├── adapter.py     # OpenAI 兼容接口，协议转换层
 ├── phases.py      # Agent 阶段状态、系统提示词
+├── tools/
+│   └── watch.py    # 可选调试脚本，监控 Open WebUI 与 adapter 的消息传递
 └── README.md
 ```
 
@@ -36,6 +38,9 @@ agent_sdk/
 
 **`phases.py`**
 维护当前阶段（`plan` / `execute`），提供对应的系统提示词和阶段切换函数。
+
+**`tools/watch.py`**
+可选的 mitmproxy 调试脚本，用于查看 Open WebUI 发给 adapter 的 `messages` 和 adapter 返回的 SSE 内容。
 
 ---
 
@@ -86,10 +91,30 @@ Settings → Connections → OpenAI API → 齿轮图标：
 
 ---
 
+## 调试
+
+如需查看 Open WebUI 与 adapter 之间的请求和响应，可使用可选监控脚本：
+
+```bash
+mitmdump --mode reverse:http://localhost:8001 --listen-port 8888 -s tools/watch.py
+```
+
+然后将 Open WebUI 的 API URL 临时改为：
+
+```text
+http://host.docker.internal:8888
+```
+
+该脚本只用于调试消息传递，不是 BioAgent 的运行必需组件。
+
+---
+
 ## 依赖
 
 ```bash
 pip install claude-agent-sdk fastapi uvicorn
+# 可选调试工具
+pip install mitmproxy
 ```
 
 - Python 3.10+
